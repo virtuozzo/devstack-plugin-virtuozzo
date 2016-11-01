@@ -1,25 +1,31 @@
 
 
-if [[ "$1" == "stack" && "$2" == "pre-install" ]]; then
-    install_package libvirt-daemon
-    sudo iniset /etc/libvirt/libvirtd.conf unix_sock_group stack
+if [[ "$1" == "stack" && "$2" == "install" ]]; then
+    # Additional tweaks for libvirt
+    sudo sed -i -e s/"#log_level = 3"/"log_level = 2"/ \
+	    -e s/"#unix_sock_group = \"libvirt\""/"unix_sock_group = \"stack\""/ \
+	    -e s/"#unix_sock_ro_perms = \"0777\""/"unix_sock_ro_perms = \"0777\""/ \
+	    -e s/"#unix_sock_rw_perms = \"0770\""/"unix_sock_rw_perms = \"0770\""/ \
+	    -e s/"#unix_sock_dir = \"\/var\/run\/libvirt\""/"unix_sock_dir = \"\/var\/run\/libvirt\""/ \
+	    -e s/"#auth_unix_ro = \"none\""/"auth_unix_ro = \"none\""/ \
+	    -e s/"#auth_unix_rw = \"none\""/"auth_unix_rw = \"none\""/ \
+	    /etc/libvirt/libvirtd.conf
+
     sudo service libvirtd restart
+    # Restart after updating underlying numpy module
+    sudo service vcmmd restart
 
 elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
-    # Restart after updating underlying numpy module
-    sudo systemctl restart vcmmd
 
     # Neutron configuration
     # Containers need metadata service
     iniset $Q_DHCP_CONF_FILE DEFAULT force_metadata True
 
+elif [[ "$1" == "stack" && "$2" = "extra" ]]; then
+ 
     # Tempest configuration
-    # build a flavor for parallels VMs
-    available_flavors=$(nova flavor-list)
-    if [[ ! ( $available_flavors =~ 'm1.parallels' ) ]]; then
-        nova flavor-create m1.parallels 1111 512 1 1
-        nova flavor-create m1.parallels2 1112 768 2 2
-    fi
+    iniset $TEMPEST_CONFIG compute build_interval 10
+    iniset $TEMPEST_CONFIG compute-feature-enabled rescue True
 
     iniset $TEMPEST_CONFIG scenario img_file "${DEFAULT_IMAGE_NAME}.hds"
     iniset $TEMPEST_CONFIG scenario img_dir "$FILES"
@@ -35,7 +41,10 @@ elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
         iniset $TEMPEST_CONFIG scenario img_properties "vm_mode:exe"
     fi
 
-    iniset $TEMPEST_CONFIG input-scenario flavor_regex "^m1.parallels$"
+    # build a flavor for containers
+    nova flavor-create vz.test1 1111 512 1 1
+    nova flavor-create vz.test2 1112 768 2 2
+    iniset $TEMPEST_CONFIG input-scenario flavor_regex "^vz.test1$"
     iniset $TEMPEST_CONFIG input-scenario ssh_user_regex "[[\"^centos7.*$\", \"centos\"]]"
     #overwrite flavor in compute section
     iniset $TEMPEST_CONFIG compute flavor_ref 1111
