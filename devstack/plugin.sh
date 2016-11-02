@@ -43,7 +43,7 @@ elif [[ "$1" == "stack" && "$2" = "extra" ]]; then
 
     # build a flavor for containers
     nova flavor-create vz.test1 1111 512 1 1
-    nova flavor-create vz.test2 1112 768 2 2
+    nova flavor-create vz.test2 1112 768 1 2
     iniset $TEMPEST_CONFIG input-scenario flavor_regex "^vz.test1$"
     iniset $TEMPEST_CONFIG input-scenario ssh_user_regex "[[\"^centos7.*$\", \"centos\"]]"
     #overwrite flavor in compute section
