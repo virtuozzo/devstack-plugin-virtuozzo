@@ -1,6 +1,11 @@
 
 
-if [[ "$1" == "stack" && "$2" == "install" ]]; then
+if [[ "$1" == "stack" && "$2" == "pre-install" ]]; then
+    if is_service_enabled "n-net"; then
+        die $LINENO \
+        "Nova networking is not supported for Virtuozzo Containers"
+    fi
+elif [[ "$1" == "stack" && "$2" == "install" ]]; then
     # Additional tweaks for libvirt
     sudo sed -i -e s/"#log_level = 3"/"log_level = 2"/ \
 	    -e s/"#unix_sock_group = \"libvirt\""/"unix_sock_group = \"stack\""/ \
