@@ -28,7 +28,7 @@ elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
         iniset $Q_DHCP_CONF_FILE DEFAULT force_metadata True
     fi
 
-elif [[ "$1" == "stack" && "$2" = "extra" ]]; then
+elif [[ "$1" == "stack" && "$2" = "test-config" ]]; then
     if is_service_enabled tempest; then 
         # Tempest configuration
         iniset $TEMPEST_CONFIG compute build_interval 10
