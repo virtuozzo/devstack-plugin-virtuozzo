@@ -1,0 +1,5 @@
+
+# VIRTUOZZO_PLUGIN_DIR contains the path to devstack-plugin-virtuozzo/devstack directory
+VIRTUOZZO_PLUGIN_DIR=$(readlink -f $(dirname ${BASH_SOURCE[0]}))
+
+source $VIRTUOZZO_PLUGIN_DIR/functions
