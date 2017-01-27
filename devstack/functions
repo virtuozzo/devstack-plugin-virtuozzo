@@ -47,7 +47,6 @@ function virtuozzo_ct_post_config_neutron () {
 function virtuozzo_ct_tempest_conf () {
     # Tempest configuration
     iniset $TEMPEST_CONFIG compute build_interval 10
-    iniset $TEMPEST_CONFIG compute-feature-enabled rescue True
 
     iniset $TEMPEST_CONFIG scenario img_file "${DEFAULT_IMAGE_NAME}.hds"
     iniset $TEMPEST_CONFIG scenario img_dir "$FILES"
@@ -75,7 +74,6 @@ function virtuozzo_ct_tempest_conf () {
 
     # Libvirt-Parallels Cloud Server
     if [ "$VIRT_DRIVER" = "libvirt" ] && [ "$LIBVIRT_TYPE" = "parallels" ]; then
-        iniset $TEMPEST_CONFIG compute-feature-enabled live_migration False
         iniset $TEMPEST_CONFIG compute-feature-enabled resize True
         iniset $TEMPEST_CONFIG compute-feature-enabled suspend True
         iniset $TEMPEST_CONFIG compute-feature-enabled vnc_console True
