@@ -41,8 +41,8 @@ function virtuozzo_ct_tempest_conf () {
     fi
 
     # build a flavor for containers
-    nova flavor-create vz.test1 1111 512 1 1
-    nova flavor-create vz.test2 1112 768 1 2
+    openstack flavor create --id 1111 --ram 512 --disk 1 --vcpus 1 --public vz.test1
+    openstack flavor create --id 1112 --ram 768 --disk 2 --vcpus 1 --public vz.test2
     iniset $TEMPEST_CONFIG input-scenario flavor_regex "^vz.test1$"
     iniset $TEMPEST_CONFIG input-scenario ssh_user_regex "[[\"^centos7.*$\", \"centos\"]]"
     #overwrite flavor in compute section
