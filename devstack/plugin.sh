@@ -4,6 +4,7 @@ if [[ "$1" == "stack" && "$2" == "pre-install" ]]; then
     virtuozzo_ct_pre_install_checks
 
 elif [[ "$1" == "stack" && "$2" == "install" ]]; then
+    virtuozzo_adjust_libvirtd_conf
     # Restart after updating underlying numpy module
     sudo service vcmmd restart
 

@@ -11,6 +11,24 @@ function virtuozzo_ct_pre_install_checks () {
     fi
 }
 
+function virtuozzo_adjust_libvirtd_conf () {
+    # Additional tweaks for libvirt
+    sudo sed -i \
+	    -e s/"#auth_unix_ro = \"none\""/"auth_unix_ro = \"none\""/ \
+	    -e s/"#auth_unix_rw = \"none\""/"auth_unix_rw = \"none\""/ \
+	    -e s/"#listen_tls = 0"/"listen_tls = 0"/ \
+	    -e s/"#listen_tcp = 1"/"listen_tcp = 1"/ \
+	    -e s/"#auth_tcp = \"sasl\""/"auth_tcp = \"none\""/ \
+	    /etc/libvirt/libvirtd.conf
+
+    sudo sed -i -e 's/^#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/' /etc/sysconfig/libvirtd
+    grep -q '^LIBVIRTD_ARGS="--listen"' /etc/sysconfig/libvirtd || \
+        die $LINENO "Cannot tweak /etc/sysconfig/libvirtd" 
+
+
+    sudo systemctl restart libvirtd.service
+}
+
 function virtuozzo_adjust_nova_conf () {
     iniset $NOVA_CONF libvirt live_migration_uri "vz+tcp://%s/system"
 }
