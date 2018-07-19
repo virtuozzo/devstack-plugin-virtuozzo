@@ -40,7 +40,7 @@ function virtuozzo_ct_post_config_neutron () {
     fi
     # Containers don't support ovs bridges currently, this is a w/a to use
     # linux bridges for security groups
-    iniset $Q_PLUGIN_CONF_FILE securitygroup firewall_driver iptables_hybrid
+    iniset /$Q_PLUGIN_CONF_FILE securitygroup firewall_driver iptables_hybrid
 }
 
 function virtuozzo_ct_tempest_conf () {
